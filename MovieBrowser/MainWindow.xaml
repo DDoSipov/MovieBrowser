@@ -3,22 +3,117 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        
+        xmlns:behaviors="http://schemas.microsoft.com/xaml/behaviors"
+        
         xmlns:local="clr-namespace:MovieBrowser"
         
         xmlns:LBT="clr-namespace:MyControlLib;assembly=MyControlLib"
         xmlns:RC="clr-namespace:MyControlLib.RatingControl_V2;assembly=MyControlLib"
         
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
+        d:DataContext="{d:DesignInstance Type=local:TopVM, IsDesignTimeCreatable=True}"
+        Title="MainWindow" Width="1059">
+    
     <Grid>
         <Grid.RowDefinitions>
-            <RowDefinition Height="50"/>
-            <RowDefinition Height="50"/>
+            <RowDefinition Height="57"/>
             <RowDefinition/>
         </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition Width="308"/>
+        </Grid.ColumnDefinitions>
 
-        <LBT:MyLabeledTextBox Text="lev" Label="{Binding Path=Value, ElementName=pep}"/>
-        <LBT:MyLabeledTextBox Text="{Binding Path=DisplayValue, ElementName=pep}" Label="fef" Grid.Row="1"/>
-        <RC:RatingControl Debug="True" Grid.Row="2" x:Name="pep"/>
+        
+        
+        <Button Content="tester" Click="Button_Click"/>
+
+
+        <ListView Grid.Row="1" Grid.Column="0"
+                  SelectionMode="Single"
+                  ItemsSource="{Binding Path=SCO}"
+                  SelectedItem="{Binding Path=SelectedMovie}">
+            <ListView.View>
+                <GridView AllowsColumnReorder="False">
+                    <GridViewColumn Width="80" DisplayMemberBinding="{Binding Path=Name}">
+                        <GridViewColumnHeader Content="Название">
+                            <behaviors:Interaction.Triggers>
+                                <behaviors:EventTrigger EventName="MouseLeftButtonDown">
+                                    <behaviors:InvokeCommandAction Command="{Binding SortColumn_CMD}" CommandParameter="Name" />
+                                </behaviors:EventTrigger>
+                            </behaviors:Interaction.Triggers>
+                        </GridViewColumnHeader>
+                    </GridViewColumn>
+                    <GridViewColumn Width="80" DisplayMemberBinding="{Binding Path=RY}">
+                        <GridViewColumnHeader Content="Год выпуска">
+                            <behaviors:Interaction.Triggers>
+                                <behaviors:EventTrigger EventName="MouseLeftButtonDown">
+                                    <behaviors:InvokeCommandAction Command="{Binding SortColumn_CMD}" CommandParameter="RY" />
+                                </behaviors:EventTrigger>
+                            </behaviors:Interaction.Triggers>
+                        </GridViewColumnHeader>
+                    </GridViewColumn>
+                    <GridViewColumn Width="85">
+                        <GridViewColumnHeader Content="Оценка">
+                            <behaviors:Interaction.Triggers>
+                                <behaviors:EventTrigger EventName="MouseLeftButtonDown">
+                                    <behaviors:InvokeCommandAction Command="{Binding SortColumn_CMD}" CommandParameter="Rating" />
+                                </behaviors:EventTrigger>
+                            </behaviors:Interaction.Triggers>
+                        </GridViewColumnHeader>
+                        <GridViewColumn.CellTemplate>
+                            <DataTemplate>
+                                <RC:RatingControl Debug="False" MaxValue="5" MaxHeight="40" Value="{Binding Path=Rating}"/>
+                            </DataTemplate>
+                        </GridViewColumn.CellTemplate>
+                    </GridViewColumn>
+                    <GridViewColumn Width="100" DisplayMemberBinding="{Binding Converter={local:IListConverter}, Mode=OneWay, Path=Genres}">
+                        <GridViewColumnHeader Content="Жанры"/>
+                    </GridViewColumn>
+                    <GridViewColumn Width="100" DisplayMemberBinding="{Binding Converter={local:IListConverter}, Mode=OneWay, Path=Tags}">
+                        <GridViewColumnHeader Content="Тэги"/>
+                    </GridViewColumn>
+                </GridView>
+            </ListView.View>
+        </ListView>
+
+        <StackPanel Grid.Row="0" Grid.Column="1" >
+            <LBT:MyLabeledTextBox Label="Search:" LabelWidth="65" Text="{Binding Path=SearchText, UpdateSourceTrigger=PropertyChanged}"/>
+        </StackPanel>
+
+        <ScrollViewer Grid.Row="1" Grid.Column="1">
+            <StackPanel Margin="10">
+                <Button Content="Edit" HorizontalAlignment="Right" Width="40" Margin="5" Command="{Binding Path=StartEdit}"/>
+                <Button Content="Save" HorizontalAlignment="Right" Width="40" Margin="5"/>
+
+                <Border BorderThickness="3" BorderBrush="red" Height="128" Width="128">
+                    <TextBlock Text="MovieImage"/>
+                </Border>
+
+                <Grid Margin="5">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition/>
+                        <ColumnDefinition/>
+                    </Grid.ColumnDefinitions>
+
+                    <TextBox BorderThickness="0" Grid.Column="0" IsReadOnly="{Binding Path=CanEdit, Converter={local:BoolInverter}}"
+                             Text="{Binding Path=SelectedMovie.Name}"/>
+                    <TextBox BorderThickness="0" Grid.Column="1" IsReadOnly="{Binding Path=CanEdit, Converter={local:BoolInverter}}"
+                             Text="{Binding Path=SelectedMovie.RY}"/>
+                </Grid>
+
+                <LBT:MyLabeledTextBox Margin="5" LabelWidth="65" Label="Tags:"
+                                      Text="{Binding Converter={local:IListConverter}, Path=SelectedMovie.Tags}"/>
+                <LBT:MyLabeledTextBox Margin="5" LabelWidth="65" Label="Genres:"
+                                      Text="{Binding Converter={local:IListConverter}, Path=SelectedMovie.Genres}"/>
+
+                <GroupBox Header="ExtraInfo:">
+                    <TextBox Text="{Binding Path=SelectedMovie.ExtraInfo}" TextWrapping="Wrap" BorderThickness="0"/>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+        
+        
     </Grid>
 </Window>

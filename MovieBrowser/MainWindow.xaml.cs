@@ -13,6 +13,8 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
+using System.Collections.ObjectModel;
+
 namespace MovieBrowser
 {
     /// <summary>
@@ -20,9 +22,17 @@ namespace MovieBrowser
     /// </summary>
     public partial class MainWindow : Window
     {
+        public TopVM TopVM = new TopVM();
+
         public MainWindow()
         {
             InitializeComponent();
+            DataContext = TopVM;
+        }
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            TopVM.Movies.Add(new Movie_VM() { Name = "ugabooga" });
         }
     }
 }
